@@ -34,7 +34,7 @@ For the Rainloop webmail, the configuration is already set for a reverse proxy (
 ###################################
 # Let's Encrypt settings
 ###################################
-LETSENCRYPT_EMAIL=me@aznable.test
+LETSENCRYPT_MAIL=me@aznable.test
 LETSENCRYPT_HOST=mail.aznable.test
 
 ###################################

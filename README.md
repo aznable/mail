@@ -47,7 +47,7 @@ VIRTUAL_PORT=8888
 
 However, if the implementation doesn't need a reverse proxy, kindly check the tutorial in this [link](https://jzweig.com/blog/setup-your-own-email-server-with-docker/) for the setup.
 
-## Basic Usage
+## Initial Usage
 
 To run the containers, just execute `docker-compose up -d` in the same directory:
 
@@ -66,3 +66,13 @@ Then execute the generation of DKIM keys:
 ```
 $ mail.sh config dkim
 ```
+
+## Rainloop Configuration
+
+* Access the admin interface of Rainloop using the defined `VIRTUAL_HOST` in `.env` file (e.g `aznable.test?admin`);
+* Sign in using `admin` as the login and `12345` as its password;
+* Once signed in, select `Domains` from the sidebar and select the `Add Domain` button;
+* Put the desired domain name in the `Name` textbox, and both `Server` textbox in the `IMAP` and `SMTP` sections;
+* Select the `Test` button to check if the specified configurations are working, it should turn green;
+* Once the test is successful, select the `Add` button to add the new domain; and
+* Sign out to the admin interface and login to the webmail (e.g. `aznable.test`) using the first email created

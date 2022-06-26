@@ -1,0 +1,56 @@
+services:
+  mail:
+    image: docker.io/mailserver/docker-mailserver:latest
+    container_name: mail
+    # If the FQDN for your mail-server is only two labels (eg: example.com),
+    # you can assign this entirely to `hostname` and remove `domainname`.
+    hostname: ${HOSTNAME}
+    domainname: ${DOMAIN}
+    # More information about the mail-server ports:
+    # https://docker-mailserver.github.io/docker-mailserver/edge/config/security/understanding-the-ports/
+    # To avoid conflicts with yaml base-60 float, DO NOT remove the quotation marks.
+    ports:
+      - "25:25"    # SMTP  (explicit TLS => STARTTLS)
+      - "143:143"  # IMAP4 (explicit TLS => STARTTLS)
+      - "465:465"  # ESMTP (implicit TLS)
+      - "587:587"  # ESMTP (explicit TLS => STARTTLS)
+      - "993:993"  # IMAP4 (implicit TLS)
+    volumes:
+      - ./data/:/var/mail/
+      - ./data/state/:/var/mail-state/
+      - ./data/logs/:/var/log/mail/
+      - ./data/config/:/tmp/docker-mailserver/
+      - /etc/localtime:/etc/localtime:ro
+    restart: always
+    stop_grace_period: 1m
+    cap_add:
+      - NET_ADMIN
+    healthcheck:
+      test: "ss --listening --tcp | grep -P 'LISTEN.+:smtp' || exit 1"
+      timeout: 3s
+      retries: 0
+    environment:
+      - POSTMASTER_ADDRESS=${POSTMASTER_ADDRESS}
+      - TZ=${TIMEZONE}
+      - ONE_DIR=${ONE_DIR}
+  loop:
+    image: hardware/rainloop
+    container_name: loop
+    restart: always
+    expose:
+      - 8888
+    volumes:
+      - ./loop:/rainloop/data
+    depends_on:
+      - mail
+    environment:
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
+      - LETSENCRYPT_EMAIL=${LETSENCRYPT_EMAIL}
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - VIRTUAL_PATH=${VIRTUAL_PATH}
+      - VIRTUAL_PORT=${VIRTUAL_PORT}
+
+networks:
+  default:
+    external:
+      name: aznable
